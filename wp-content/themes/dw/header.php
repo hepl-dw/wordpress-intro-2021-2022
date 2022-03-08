@@ -12,6 +12,6 @@
 
         <nav class="header__nav nav">
             <h2 class="nav__title">Navigation principale</h2>
-            <p class="nav__placeholder">TODO.</p>
+            <p class="nav__placeholder">TODO...</p>
         </nav>
     </header>
