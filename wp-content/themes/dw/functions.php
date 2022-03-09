@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/Menus/PrimaryMenuWalker.php');
+
 // Désactiver l'éditeur "Gutenberg" de Wordpress
 add_filter('use_block_editor_for_post', '__return_false');
 
@@ -35,3 +37,11 @@ function dw_get_trips($count = 20)
     // 2. on retourne l'objet WP_Query
     return $trips;
 }
+
+// Enregistrer les menus de navigation
+
+register_nav_menu('primary', 'Emplacement de la navigation principale de haut de page');
+register_nav_menu('footer', 'Emplacement de la navigation de pied de page');
+
+
+
