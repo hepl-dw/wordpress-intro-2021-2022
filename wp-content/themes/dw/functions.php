@@ -70,29 +70,32 @@ function dw_get_menu_items($location)
     // Récupérer le menu qui correspond à l'emplacement souhaité
     $locations = get_nav_menu_locations();
 
-    if($locations[$location] ?? false) {
-        $menu = $locations[$location];
+    if(! ($locations[$location] ?? false)) {
+        return $items;
+    }
 
-        // Récupérer tous les éléments du menu en question
-        $posts = wp_get_nav_menu_items($menu);
+    $menu = $locations[$location];
 
-        // Traiter chaque élément de menu pour le transformer en objet
-        foreach($posts as $post) {
-            // Créer une instance d'un objet personnalisé à partir de $post
-            $item = new PrimaryMenuItem($post);
+    // Récupérer tous les éléments du menu en question
+    $posts = wp_get_nav_menu_items($menu);
 
-            // Ajouter cette instance soit à $items (s'il s'agit d'un élément de niveau 0), soit en tant que sous-élément d'un item déjà existant.
-            if($item->isSubItem()) {
-                // Ajouter l'instance comme "enfant" d'un item existant
-                foreach($items as $existing) {
-                    if($existing->isParentFor($item)) {
-                        $existing->addSubItem($item);
-                    }
-                }
-            } else {
-                // Il s'agit d'un élément de niveau 0, on l'ajoute au tableau
-                $items[] = $item;
-            }
+    // Traiter chaque élément de menu pour le transformer en objet
+    foreach($posts as $post) {
+        // Créer une instance d'un objet personnalisé à partir de $post
+        $item = new PrimaryMenuItem($post);
+
+        // Ajouter cette instance soit à $items (s'il s'agit d'un élément de niveau 0), soit en tant que sous-élément d'un item déjà existant.
+        if(! $item->isSubItem()) {
+            // Il s'agit d'un élément de niveau 0, on l'ajoute au tableau
+            $items[] = $item;
+            continue;
+        }
+
+        // Ajouter l'instance comme "enfant" d'un item existant
+        foreach($items as $existing) {
+            if(! $existing->isParentFor($item)) continue;
+            
+            $existing->addSubItem($item);
         }
     }
 
@@ -106,44 +109,79 @@ add_action('admin_post_submit_contact_form', 'dw_handle_submit_contact_form');
 
 function dw_handle_submit_contact_form()
 {
-    $nonce = $_POST['_wpnonce'];
-
-    if(wp_verify_nonce($nonce, 'nonce_check_contact_form')) {
-        $firstname = sanitize_text_field($_POST['firstname']);
-        $lastname = sanitize_text_field($_POST['lastname']);
-        $email = sanitize_email($_POST['email']);
-        $phone = sanitize_text_field($_POST['phone']);
-        $message = sanitize_text_field($_POST['message']);
-
-        if($firstname && $lastname && $email && $message) {
-            if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                if(($_POST['rules'] ?? null) === '1') {
-                    // Stocker en base de données
-                    $id = wp_insert_post([
-                        'post_type' => 'message',
-                        'post_title' => 'Message de ' . $firstname . ' ' . $lastname,
-                        'post_content' => $message,
-                        'post_status' => 'publish',
-                    ]);
-
-                    // Envoyer un mail
-                    $content = 'Bonjour, un nouveau message de contact a été envoyé.<br />';
-                    $content .= 'Pour le visualiser : ' . get_edit_post_link($id);
-
-                    wp_mail('toon@whitecube.be', 'Nouveau message', $content);
-                } else {
-                    // TODO : afficher erreur de validation "conditions générales"
-                }
-            } else {
-                // TODO : afficher erreur de validation de type "email incorrect"
-            }
-        } else {
-            // TODO : afficher erreurs de validation de type "required"
-        }
-    } else {
+    if(! dw_verify_contact_form_nonce()) {
         // C'est pas OK.
         // TODO : afficher un message d'erreur "unauthorized"
+        return;
     }
+
+    $data = dw_sanitize_contact_form_data();
+
+    if($errors = dw_validate_contact_form_data($data)) {
+        // TODO : afficher les erreurs de validation
+        return;
+    }
+    
+    // Stocker en base de données
+    $id = wp_insert_post([
+        'post_type' => 'message',
+        'post_title' => 'Message de ' . $firstname . ' ' . $lastname,
+        'post_content' => $message,
+        'post_status' => 'publish',
+    ]);
+
+    // Envoyer un mail
+    $content = 'Bonjour, un nouveau message de contact a été envoyé.<br />';
+    $content .= 'Pour le visualiser : ' . get_edit_post_link($id);
+
+    wp_mail('toon@whitecube.be', 'Nouveau message', $content);
+}
+
+function dw_verify_contact_form_nonce()
+{
+    $nonce = $_POST['_wpnonce'];
+
+    return wp_verify_nonce($nonce, 'nonce_check_contact_form');
+}
+
+function dw_sanitize_contact_form_data()
+{
+    return [
+        'firstname' => sanitize_text_field($_POST['firstname'] ?? null),
+        'lastname' => sanitize_text_field($_POST['lastname'] ?? null),
+        'email' => sanitize_email($_POST['email'] ?? null),
+        'phone' => sanitize_text_field($_POST['phone'] ?? null),
+        'message' => sanitize_text_field($_POST['message'] ?? null),
+        'rules' => $_POST['rules'] ?? null
+    ];
+}
+
+function dw_validate_contact_form_data($data)
+{
+    $errors = [];
+
+    $required = ['firstname','lastname','email','message'];
+    $email = ['email'];
+    $accepted = ['rules'];
+
+    foreach($data as $key => $value) {
+        if(in_array($key, $required) && ! $value) {
+            $errors[$key] = 'required';
+            continue;
+        }
+
+        if(in_array($key, $email) && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            $errors[$key] = 'email';
+            continue;
+        }
+
+        if(in_array($key, $accepted) && $value !== '1') {
+            $errors[$key] = 'accepted';
+            continue;
+        }
+    }
+
+    return $errors ?: false;
 }
 
 
