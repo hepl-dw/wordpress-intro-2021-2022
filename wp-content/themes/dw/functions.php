@@ -3,6 +3,17 @@
 // require_once(__DIR__ . '/Menus/PrimaryMenuWalker.php');
 require_once(__DIR__ . '/Menus/PrimaryMenuItem.php');
 
+// Lancer la session PHP
+
+add_action('init', 'dw_init_php_session', 1);
+
+function dw_init_php_session()
+{
+    if(! session_id()) {
+        session_start();
+    }
+}
+
 // Désactiver l'éditeur "Gutenberg" de Wordpress
 add_filter('use_block_editor_for_post', '__return_false');
 
@@ -118,15 +129,20 @@ function dw_handle_submit_contact_form()
     $data = dw_sanitize_contact_form_data();
 
     if($errors = dw_validate_contact_form_data($data)) {
-        // TODO : afficher les erreurs de validation
-        return;
+        $_SESSION['feedback_contact_form'] = [
+            'success' => false,
+            'data' => $data,
+            'errors' => $errors,
+        ];
+
+        return wp_redirect($_POST['_wp_http_referer']);
     }
     
     // Stocker en base de données
     $id = wp_insert_post([
         'post_type' => 'message',
-        'post_title' => 'Message de ' . $firstname . ' ' . $lastname,
-        'post_content' => $message,
+        'post_title' => 'Message de ' . $data['firstname'] . ' ' . $data['lastname'],
+        'post_content' => $data['message'],
         'post_status' => 'publish',
     ]);
 
@@ -134,7 +150,14 @@ function dw_handle_submit_contact_form()
     $content = 'Bonjour, un nouveau message de contact a été envoyé.<br />';
     $content .= 'Pour le visualiser : ' . get_edit_post_link($id);
 
-    wp_mail('toon@whitecube.be', 'Nouveau message', $content);
+    wp_mail(get_bloginfo('admin_email'), 'Nouveau message', $content);
+
+    // Tout est OK, afficher le feedback positif
+    $_SESSION['feedback_contact_form'] = [
+        'success' => true,
+    ];
+
+    return wp_redirect($_POST['_wp_http_referer']);
 }
 
 function dw_verify_contact_form_nonce()
@@ -182,6 +205,28 @@ function dw_validate_contact_form_data($data)
     }
 
     return $errors ?: false;
+}
+
+function dw_get_contact_field_value($field)
+{
+    if(! isset($_SESSION['feedback_contact_form'])) {
+        return '';
+    }
+
+    return $_SESSION['feedback_contact_form']['data'][$field] ?? '';
+}
+
+function dw_get_contact_field_error($field)
+{
+    if(! isset($_SESSION['feedback_contact_form'])) {
+        return '';
+    }
+
+    if(! isset($_SESSION['feedback_contact_form']['errors'][$field])) {
+        return '';
+    }
+
+    return '<p class="form__error">Problème : ' . $_SESSION['feedback_contact_form']['errors'][$field] . '</p>';
 }
 
 
