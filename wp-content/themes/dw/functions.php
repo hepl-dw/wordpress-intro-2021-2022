@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/CustomSearchQuery.php');
 // require_once(__DIR__ . '/Menus/PrimaryMenuWalker.php');
 require_once(__DIR__ . '/Menus/PrimaryMenuItem.php');
 
@@ -53,14 +54,15 @@ register_post_type('message', [
 ]);
 
 // Récupérer les trips via une requête Wordpress
-function dw_get_trips($count = 20)
+function dw_get_trips($count = 20, $search = null)
 {
     // 1. on instancie l'objet WP_Query
-    $trips = new WP_Query([
+    $trips = new DW_CustomSearchQuery([
         'post_type' => 'trip',
         'orderby' => 'date',
         'order' => 'DESC',
         'posts_per_page' => $count,
+        's' => strlen($search) ? $search : null,
     ]);
 
     // 2. on retourne l'objet WP_Query
@@ -256,4 +258,17 @@ function dw_mix($path)
     // C'est OK, on génère l'URL vers la ressource sur base du nom de fichier avec cache-bursting.
     return get_stylesheet_directory_uri() . '/public' . $manifest[$path];
 }
+
+// On va se plugger dans l'exécution de la requête de recherche pour la contraindre à chercher dans les articles uniquement.
+
+function dw_configure_search_query($query)
+{
+    if($query->is_search && ! is_admin() && ! is_a($query, DW_CustomSearchQuery::class)) {
+        $query->set('post_type', 'post');
+    }
+
+    return $query;
+}
+
+add_filter('pre_get_posts', 'dw_configure_search_query');
 

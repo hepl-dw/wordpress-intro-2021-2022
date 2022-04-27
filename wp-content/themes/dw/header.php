@@ -39,4 +39,11 @@
                 <?php endforeach; ?>
             </ul>
         </nav>
+        <form method="get" action="<?= get_home_url(); ?>" class="header__search search" role="search">
+            <div class="search__container">
+                <label for="header_search" class="search__label">Votre recherche</label>
+                <input type="text" name="s" id="header_search" class="search__input" value="<?= get_search_query(); ?>" />
+                <button type="submit" class="search__btn">Rechercher</button>
+            </div>
+        </form>
     </header>
