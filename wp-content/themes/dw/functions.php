@@ -272,3 +272,11 @@ function dw_configure_search_query($query)
 
 add_filter('pre_get_posts', 'dw_configure_search_query');
 
+// Fonction permettant d'inclure des composants et d'y injecter des variables locales (scope de l'appel de fonction)
+
+function dw_include(string $partial, array $variables = [])
+{
+    extract($variables);
+
+    include(__DIR__ . '/partials/' . $partial . '.php');
+}
