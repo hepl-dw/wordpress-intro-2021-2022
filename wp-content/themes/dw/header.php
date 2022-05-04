@@ -9,41 +9,43 @@
 </head>
 <body>
     <header class="header">
-        <h1 class="header__title"><?= get_bloginfo('name'); ?></h1>
-        <p class="header__tagline"><?= get_bloginfo('description'); ?></p>
+        <div class="header__wrapper">
+            <h1 class="header__title"><?= get_bloginfo('name'); ?><span class="sro"> - Test</span></h1>
+            <p class="header__tagline"><?= get_bloginfo('description'); ?></p>
 
-        <nav class="header__nav nav">
-            <h2 class="nav__title">Navigation principale</h2>
-            <?php // wp_nav_menu([
-            //     'theme_location' => 'primary',
-            //     'menu_class' => 'nav__links',
-            //     'menu_id' => 'navigation',
-            //     'container_class' => 'nav__container',
-            //     'walker' => new PrimaryMenuWalker()
-            // ]); ?>
+            <nav class="header__nav nav">
+                <h2 class="nav__title">Navigation principale</h2>
+                <?php // wp_nav_menu([
+                //     'theme_location' => 'primary',
+                //     'menu_class' => 'nav__links',
+                //     'menu_id' => 'navigation',
+                //     'container_class' => 'nav__container',
+                //     'walker' => new PrimaryMenuWalker()
+                // ]); ?>
 
-            <ul class="nav__container">
-                <?php foreach(dw_get_menu_items('primary') as $link): ?>
-                <li class="<?= $link->getBemClasses('nav__item'); ?>">
-                    <a href="<?= $link->url; ?>" class="nav__link"><?= $link->label; ?></a>
-                    <?php if($link->hasSubItems()): ?>
-                    <ul class="nav__subitems">
-                        <?php foreach($link->subitems as $sub): ?>
-                        <li class="<?= $link->getBemClasses('nav__subitem'); ?>">
-                            <a href="<?= $sub->url; ?>" class="nav__link"><?= $sub->label; ?></a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                </li>
-                <?php endforeach; ?>
-            </ul>
-        </nav>
-        <form method="get" action="<?= get_home_url(); ?>" class="header__search search" role="search">
-            <div class="search__container">
-                <label for="header_search" class="search__label">Votre recherche</label>
-                <input type="text" name="s" id="header_search" class="search__input" value="<?= get_search_query(); ?>" />
-                <button type="submit" class="search__btn">Rechercher</button>
-            </div>
-        </form>
+                <ul class="nav__container">
+                    <?php foreach(dw_get_menu_items('primary') as $link): ?>
+                    <li class="<?= $link->getBemClasses('nav__item'); ?>">
+                        <a href="<?= $link->url; ?>" class="nav__link"><?= $link->label; ?></a>
+                        <?php if($link->hasSubItems()): ?>
+                        <ul class="nav__subitems">
+                            <?php foreach($link->subitems as $sub): ?>
+                            <li class="<?= $link->getBemClasses('nav__subitem'); ?>">
+                                <a href="<?= $sub->url; ?>" class="nav__link"><?= $sub->label; ?></a>
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </nav>
+            <form method="get" action="<?= get_home_url(); ?>" class="header__search search" role="search">
+                <div class="search__container">
+                    <label for="header_search" class="search__label">Votre recherche</label>
+                    <input type="text" name="s" id="header_search" class="search__input" value="<?= get_search_query(); ?>" />
+                    <button type="submit" class="search__btn">Rechercher</button>
+                </div>
+            </form>
+        </div>
     </header>

@@ -1,1 +1,11 @@
 @import "reset";
+
+.header {
+    background: lightblue;
+    display: flex;
+    justify-content: center;
+
+    &__wrapper {
+        width: 1024px;
+    }
+}
