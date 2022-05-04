@@ -6,10 +6,12 @@ require_once(__DIR__ . '/Menus/PrimaryMenuItem.php');
 
 // Lancer la session PHP
 
-add_action('init', 'dw_init_php_session', 1);
+add_action('init', 'dw_boot_theme', 1);
 
-function dw_init_php_session()
+function dw_boot_theme()
 {
+    load_theme_textdomain('dw', __DIR__ . '/locales');
+
     if(! session_id()) {
         session_start();
     }
