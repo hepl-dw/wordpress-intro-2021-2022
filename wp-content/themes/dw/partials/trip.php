@@ -1,5 +1,5 @@
 <article class="trip">
-    <a href="<?= get_the_permalink(); ?>" class="trip__link">Lire le récit de voyage "<?= get_the_title(); ?>"</a>
+    <a href="<?= get_the_permalink(); ?>" class="trip__link"><?= str_replace(':title', get_the_title(), __('Lire le récit de voyage ":title"', 'dw')); ?></a>
     <div class="trip__card">
         <header class="trip__head">
             <h3 class="trip__title"><?= get_the_title(); ?></h3>

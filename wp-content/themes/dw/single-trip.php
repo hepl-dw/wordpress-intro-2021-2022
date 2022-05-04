@@ -9,18 +9,18 @@
             <?php the_content(); ?>
         </div>
         <aside class="singleTrip__details">
-            <h3 class="singleTrip__subtitle">Détails du voyage</h3>
+            <h3 class="singleTrip__subtitle"><?= __('Détails du voyage','dw'); ?></h3>
             <dl class="singleTrip__definitions">
-                <dt class="singleTrip__label">Date de départ</dt>
+                <dt class="singleTrip__label"><?= __('Date de départ','dw'); ?></dt>
                 <dd class="singleTrip__data">
                     <time class="singleTrip__time" datetime="<?= date('c', strtotime(get_field('departure_date', false, false))); ?>"><?= ucfirst(date_i18n('d F Y', strtotime(get_field('departure_date', false, false)))); ?></time>
                 </dd>
-                <dt class="singleTrip__label">Date de retour</dt>
+                <dt class="singleTrip__label"><?= __('Date de retour','dw'); ?></dt>
                 <dd class="singleTrip__data">
                     <?php if(get_field('return_date')): ?>
                     <time class="singleTrip__time" datetime="<?= date('c', strtotime(get_field('return_date', false, false))); ?>"><?= ucfirst(date_i18n('d F Y', strtotime(get_field('return_date', false, false)))); ?></time>
                     <?php else: ?>
-                    <span class="singleTrip__empty">Aucune date de retour de prévue pour le moment.</span>
+                    <span class="singleTrip__empty"><?= __('Aucune date de retour de prévue pour le moment.','dw'); ?></span>
                     <?php endif; ?>
                 </dd>
             </dl>
