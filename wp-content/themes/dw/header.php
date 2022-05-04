@@ -6,6 +6,8 @@
     <title>TODO</title>
     <link rel="stylesheet" type="text/css" href="<?= dw_mix('/css/style.css'); ?>" />
     <script type="text/javascript" src="<?= dw_mix('js/script.js'); ?>"></script>
+    
+    <?php wp_head(); ?>
 </head>
 <body>
     <header class="header">
@@ -41,7 +43,7 @@
                 </ul>
 
                 <div class="nav__languages">
-                    <?php foreach(pll_the_languages(['raw' => true]) as $code => $locale) :  ?>
+                    <?php foreach(pll_the_languages(['raw' => true]) as $code => $locale) : ?>
                     <a href="<?= $locale['url']; ?>" class="nav__locale" title="<?= $locale['name']; ?>" lang="<?= $locale['locale']; ?>" hreflang="<?= $locale['locale']; ?>"><?= $code; ?></a>
                     <?php endforeach; ?>
                 </div>
