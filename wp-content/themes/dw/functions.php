@@ -282,6 +282,13 @@ function dw_configure_search_query($query)
         $query->set('post_type', 'post');
     }
 
+    // Faire un système de filtres "custom" (sans passer par la méthode WP) :
+    // if(is_archive() && isset($_GET['filter-country'])) {
+    //     $query->set('tax_query', [
+    //         ['taxonomy' => 'country', 'field' => 'slug', 'terms' => explode(',', $_GET['filter-country'])]
+    //     ]);
+    // }
+
     return $query;
 }
 
