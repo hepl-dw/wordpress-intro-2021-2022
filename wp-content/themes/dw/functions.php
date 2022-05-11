@@ -32,6 +32,7 @@ register_post_type('trip', [
     ],
     'description' => 'Tous les articles qui décrivent un voyage',
     'public' => true,
+    'has_archive' => true,
     'menu_position' => 5,
     'menu_icon' => 'dashicons-palmtree',
     'supports' => ['title','editor','thumbnail'],
@@ -53,6 +54,18 @@ register_post_type('message', [
         'create_posts' => false,
     ],
     'map_meta_cap' => true,
+]);
+
+// Enregistrer une taxonomie (façon de classifier des posts) pour les pays où des voyages ont eu lieu.
+
+register_taxonomy('country', ['trip'], [
+    'labels' => [
+        'name' => 'Pays',
+        'singular_name' => 'Pays',
+    ],
+    'description' => 'Pays visités et exploités dans nos récits de voyage.',
+    'public' => true,
+    'hierarchical' => true,
 ]);
 
 // Récupérer les trips via une requête Wordpress
