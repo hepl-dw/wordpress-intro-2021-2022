@@ -302,3 +302,20 @@ function dw_include(string $partial, array $variables = [])
 
     include(__DIR__ . '/partials/' . $partial . '.php');
 }
+
+// Fonction permettant de récupérer la première page appartenant à un template donné
+
+function dw_get_template_page(string $template)
+{
+    // Créer une WP_Query
+    $query = new WP_Query([
+        'post_type' => 'page', // Filtrer sur le post_type de type "page"
+        'post_status' => 'publish', // Uniquement les pages publiées
+        'meta_query' => [
+            ['key' => '_wp_page_template', 'value' => $template . '.php'] // Filtrer sur le type de template utilisé
+        ]
+    ]);
+
+    // Retourner la première occurrence pour cette requête (ou NULL)
+    return $query->posts[0] ?? null;
+}
